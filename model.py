@@ -52,12 +52,6 @@ if __name__ == "__main__":
         "model_file", type=str, help="Path to where you want to save the model file"
     )
 
-    # Run command
-    run_parser = subparsers.add_parser("run", help="Run the random forest model")
-    train_parser.add_argument(
-        "model_file", type=str, help="Path to the saved model file to load"
-    )
-
     args = parser.parse_args()
 
     if args.command == "train":
@@ -66,7 +60,3 @@ if __name__ == "__main__":
 
         with open(args.model_file, "wb") as f:
             pickle.dump(model, f)
-
-    elif args.command == "run":
-        # Perform the desired operations for running the model
-        pass
