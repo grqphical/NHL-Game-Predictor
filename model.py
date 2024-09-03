@@ -5,6 +5,8 @@ from sklearn.metrics import accuracy_score
 from data_processor import load_and_process_data
 import pandas as pd
 from sklearn.metrics import classification_report
+import argparse
+import pickle
 
 
 def train_random_forest_model(data: pd.DataFrame):
@@ -40,5 +42,31 @@ def train_random_forest_model(data: pd.DataFrame):
 
 
 if __name__ == "__main__":
-    data = load_and_process_data("all_teams.csv")
-    model = train_random_forest_model(data)
+    parser = argparse.ArgumentParser(description="NHL Game Predictor")
+    subparsers = parser.add_subparsers(dest="command")
+
+    # Train command
+    train_parser = subparsers.add_parser("train", help="Train the random forest model")
+    train_parser.add_argument("data_file", type=str, help="Path to the data file")
+    train_parser.add_argument(
+        "model_file", type=str, help="Path to where you want to save the model file"
+    )
+
+    # Run command
+    run_parser = subparsers.add_parser("run", help="Run the random forest model")
+    train_parser.add_argument(
+        "model_file", type=str, help="Path to the saved model file to load"
+    )
+
+    args = parser.parse_args()
+
+    if args.command == "train":
+        data = load_and_process_data(args.data_file)
+        model = train_random_forest_model(data)
+
+        with open(args.model_file, "wb") as f:
+            pickle.dump(model, f)
+
+    elif args.command == "run":
+        # Perform the desired operations for running the model
+        pass
