@@ -8,8 +8,8 @@ from sklearn.metrics import classification_report
 
 
 def train_random_forest_model(data: pd.DataFrame):
-    training_data = data[data["gameDate"].dt.year < 2023]
-    testing_data = data[data["gameDate"].dt.year == 2023]
+    training_data = data[data["gameDate"].dt.year < 2020]
+    testing_data = data[data["gameDate"].dt.year >= 2020]
 
     predictors = [
         "home_or_away",
@@ -36,7 +36,9 @@ def train_random_forest_model(data: pd.DataFrame):
 
     print(classification_report(testing_data["outcome"], preds))
 
+    return model
+
 
 if __name__ == "__main__":
-    data = load_and_process_data("data/all_teams.csv")
-    train_random_forest_model(data)
+    data = load_and_process_data("all_teams.csv")
+    model = train_random_forest_model(data)
