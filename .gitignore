@@ -4,3 +4,4 @@ __pycache__
 results.txt
 columns.txt
 *.pkl
+*.csv

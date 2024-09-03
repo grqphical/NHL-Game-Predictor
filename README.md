@@ -9,6 +9,10 @@ In testing it has about a ~60% accuracy rating however I have yet to test it bas
 
 This project is still a WIP, I plan to add a web interface to allow you to customize team matchups and predict upcoming NHL games using the NHL API
 
+## Where to get Dataset
+
+Here: https://moneypuck.com/moneypuck/playerData/careers/gameByGame/all_teams.csv
+
 ## License
 
 MIT License
