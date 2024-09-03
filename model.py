@@ -21,6 +21,8 @@ def train_model(data: pd.DataFrame):
         "penaltiesFor_rolling",
         "missedShotsFor_rolling",
         "faceOffsWonFor_rolling",
+        "corsiPercentage_rolling",
+        "homeAdvantage",
     ]
 
     model = RandomForestClassifier(random_state=44)

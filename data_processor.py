@@ -32,6 +32,7 @@ def load_and_process_data(file: str) -> pd.DataFrame:
             "penaltiesFor",
             "missedShotsFor",
             "faceOffsWonFor",
+            "corsiPercentage",
         ]
     ]
 
@@ -63,6 +64,7 @@ def load_and_process_data(file: str) -> pd.DataFrame:
         "penaltiesFor",
         "missedShotsFor",
         "faceOffsWonFor",
+        "corsiPercentage",
     ]
     new_cols = [f"{c}_rolling" for c in cols]
 
@@ -73,5 +75,10 @@ def load_and_process_data(file: str) -> pd.DataFrame:
 
     # reset the index
     hockey_data.index = range(hockey_data.shape[0])
+
+    # Add a column for home field advantage
+    hockey_data["homeAdvantage"] = (
+        hockey_data["home_or_away"] * hockey_data["goalsFor_rolling"]
+    )
 
     return hockey_data
