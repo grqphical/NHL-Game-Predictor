@@ -3,8 +3,8 @@
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from data_processor import load_and_process_data
-from sklearn.metrics import precision_score
 import pandas as pd
+from sklearn.metrics import classification_report
 
 
 def train_model(data: pd.DataFrame):
@@ -25,18 +25,18 @@ def train_model(data: pd.DataFrame):
         "homeAdvantage",
     ]
 
-    model = RandomForestClassifier(random_state=44)
+    model = RandomForestClassifier(
+        random_state=44,
+        n_estimators=250,
+        n_jobs=10,
+    )
     model.fit(training_data[predictors], training_data["outcome"])
 
     preds = model.predict(testing_data[predictors])
 
     print(accuracy_score(testing_data["outcome"], preds))
 
-    combined = pd.DataFrame(dict(actual=testing_data["outcome"], predicted=preds))
-    confusion_matrix = pd.crosstab(
-        index=combined["actual"], columns=combined["predicted"]
-    )
-    print(confusion_matrix)
+    print(classification_report(testing_data["outcome"], preds))
 
 
 if __name__ == "__main__":
