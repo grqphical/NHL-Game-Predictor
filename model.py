@@ -1,18 +1,22 @@
 """Random forest classification model"""
 
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import StackingClassifier, RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import LinearSVC
+from sklearn.utils import class_weight
+from xgboost import XGBClassifier
 from sklearn.metrics import accuracy_score
 from data_processor import load_and_process_data
 import pandas as pd
 from sklearn.metrics import classification_report
 import argparse
 import pickle
+import math
 
 
 def train_random_forest_model(data: pd.DataFrame):
     training_data = data[data["gameDate"].dt.year < 2020]
     testing_data = data[data["gameDate"].dt.year >= 2020]
-
     predictors = [
         "home_or_away",
         "dayOfWeek",
@@ -27,16 +31,50 @@ def train_random_forest_model(data: pd.DataFrame):
         "homeAdvantage",
     ]
 
-    model = RandomForestClassifier(
-        random_state=44, n_estimators=250, n_jobs=10, class_weight="balanced"
+    value_counts = training_data.value_counts("outcome").array.tolist()
+
+    X_train = training_data[predictors]
+    y_train = training_data["outcome"]
+
+    X_test = testing_data[predictors]
+    y_test = testing_data["outcome"]
+
+    estimators = [
+        (
+            "rf",
+            RandomForestClassifier(
+                random_state=44,
+                n_estimators=250,
+                n_jobs=10,
+                class_weight={0: 0.677, 1: 1},
+            ),
+        ),
+        (
+            "histgb",
+            XGBClassifier(
+                random_state=44,
+                learning_rate=0.01,
+                max_depth=12,
+                scale_pos_weight=math.sqrt(value_counts[0] / value_counts[1]),
+                n_jobs=10,
+            ),
+        ),
+        ("svc", LinearSVC(random_state=44, class_weight={0: 0.677, 1: 1})),
+    ]
+
+    model = StackingClassifier(
+        estimators=estimators,
+        final_estimator=LogisticRegression(
+            random_state=44, class_weight={0: 0.677, 1: 1}
+        ),
     )
-    model.fit(training_data[predictors], training_data["outcome"])
+    model.fit(X_train, y_train)
 
-    preds = model.predict(testing_data[predictors])
+    preds = model.predict(X_test)
 
-    print(accuracy_score(testing_data["outcome"], preds))
+    print(accuracy_score(y_test, preds))
 
-    print(classification_report(testing_data["outcome"], preds))
+    print(classification_report(y_test, preds))
 
     return model
 
